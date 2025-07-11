@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RikAI - Toyota Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #fee2e2;
+        }
+        
+        .header-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        
+        .title h1 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #111827;
+        }
+        
+        .title h1 .ai {
+            color: #dc2626;
+        }
+        
+        .title p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-button.active {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .nav-button:not(.active) {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .nav-button:not(.active):hover {
+            background: #d1d5db;
+        }
+        
+        .nav-button.ai-style {
+            background: linear-gradient(to right, #9333ea, #ec4899);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .nav-button.ai-style:hover {
+            background: linear-gradient(to right, #7c3aed, #db2777);
+        }
+        
+        .nav-button.ai-style.active {
+            background: linear-gradient(to right, #7c3aed, #db2777);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        /* Comparison Cards */
+        .comparison-section {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #dc2626;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            width: 100%; /* Per mobile */
+        }
+        
+        .help-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .card {
+            background: linear-gradient(to bottom right, #fef2f2, #fee2e2);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 2px solid #fecaca;
+            position: relative;
+        }
+        
+        .card.competitor {
+            background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+            border-color: #e5e7eb;
+        }
+        
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #991b1b;
+            margin-bottom: 2rem;
+        }
+        
+        .card.competitor .card-title {
+            color: #1f2937;
+        }
+        
+        .ai-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
+        }
+        
+        .ai-button.customer { background: linear-gradient(to right, #9333ea, #ec4899); }
+        .ai-button.customer:hover { background: linear-gradient(to right, #7c3aed, #db2777); }
+        .ai-button.competitor { background: linear-gradient(to right, #2563eb, #06b6d4); }
+        .ai-button.competitor:hover { background: linear-gradient(to right, #1d4ed8, #0891b2); }
+        
+        .metric-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .metric-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; }
+        .metric-name { color: #4b5563; font-weight: 500; }
+        .metric-value { display: flex; align-items: center; gap: 0.5rem; }
+        .metric-value strong { color: #111827; }
+        
+        .diff-badge { padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; background: #f3f4f6; color: #374151; display: inline-flex; align-items: center; gap: 0.25rem; }
+        .arrow { font-size: 0.875rem; }
+        .arrow.up { color: #10b981; }
+        .arrow.down { color: #ef4444; }
+        
+        /* Table */
+        .table-section { background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; }
+        .table-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .export-buttons { display: flex; gap: 0.5rem; }
+        .export-button { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; color: white; transition: all 0.3s; }
+        .export-button.pdf { background: #2563eb; }
+        .export-button.pdf:hover { background: #1d4ed8; }
+        .export-button.csv { background: #059669; }
+        .export-button.csv:hover { background: #047857; }
+        
+        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: linear-gradient(to bottom, #f3f4f6, #f9fafb); padding: 1rem; text-align: center; font-size: 0.875rem; font-weight: bold; border-bottom: 2px solid #d1d5db; }
+        th.toyota { background: linear-gradient(to bottom, #fee2e2, #fef2f2); color: #991b1b; border-left: 2px solid #fecaca; border-right: 2px solid #fecaca; }
+        td { padding: 1rem; text-align: center; font-size: 0.875rem; border-bottom: 1px solid #f3f4f6; }
+        td.metric-name { text-align: left; font-weight: 500; color: #111827; border-right: 1px solid #e5e7eb; }
+        td.toyota { background: #fef2f2; font-weight: bold; color: #991b1b; border-left: 2px solid #fee2e2; border-right: 2px solid #fee2e2; }
+        tr:nth-child(even) { background: #f9fafb; }
+        tr.model-row { background: #eff6ff; }
+        tr.model-row td { font-style: italic; font-size: 0.75rem; }
+        
+        .notes { margin-top: 1.5rem; font-size: 0.875rem; color: #6b7280; }
+        .note-item { display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem; }
+        
+        /* Hide/Show sections */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        
+        /* Insights Section Styles */
+        .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .insight-card { background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; }
+        .insight-card.full-width { grid-column: 1 / -1; }
+        .ai-summary-card { background: linear-gradient(to right, #fdf4ff, #eef2ff); border: 2px solid #d1d5db; border-left: 5px solid #9333ea; }
+        .ai-summary-card .section-title .icon { color: #9333ea; }
+        .ai-summary-content p { font-size: 1rem; color: #374151; line-height: 1.6; margin-bottom: 1rem; }
+        .ai-summary-content ul { list-style: none; padding-left: 0; }
+        .ai-summary-content li { font-size: 0.9rem; color: #4b5563; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; gap: 0.5rem; }
+        .ai-summary-content li:last-child { border-bottom: none; }
+
+        .chart-container { position: relative; height: 400px; margin-top: 1rem; }
+        .spider-chart { width: 100%; height: 100%; }
+        .scatter-plot { position: relative; width: 100%; height: 100%; border-left: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
+        .scatter-point { position: absolute; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: white; cursor: pointer; transition: transform 0.3s; }
+        .scatter-point:hover { transform: scale(1.2); }
+        .scatter-point.toyota { background: #dc2626; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3); }
+        .scatter-point.competitor { background: #6b7280; box-shadow: 0 4px 6px -1px rgba(107, 114, 128, 0.3); }
+        .axis-label { position: absolute; font-size: 0.875rem; font-weight: 500; color: #4b5563; }
+        .axis-label.x { bottom: -30px; left: 50%; transform: translateX(-50%); }
+        .axis-label.y { left: -80px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+        .line-chart { position: relative; width: 100%; height: 100%; border-left: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb; }
+        .line-path { fill: none; stroke-width: 3; }
+        .line-point { r: 4; stroke-width: 2; fill: white; }
+        .legend { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; }
+        .legend-color { width: 1rem; height: 1rem; border-radius: 0.25rem; }
+        .legend-line { width: 2rem; height: 3px; border-radius: 2px; }
+
+        /* ---------------------------------- */
+        /* MODIFICA: Stili per la visualizzazione Mobile */
+        /* ---------------------------------- */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            .logo-section {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+            .logo { width: 60px; height: 60px; }
+            .title h1 { font-size: 1.5rem; }
+            .title p { font-size: 0.75rem; }
+
+            .nav-buttons { width: 100%; flex-direction: column; gap: 0.5rem; }
+
+            .main-content { padding: 1rem; }
+            .table-section, .comparison-section, .insight-card { padding: 1rem; }
+
+            .table-header { flex-direction: column; align-items: stretch; gap: 1rem; }
+            .section-title { font-size: 1.25rem; margin-bottom: 0.5rem; }
+
+            .filters { flex-direction: column; align-items: stretch; gap: 1.5rem; }
+            .filter-group { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+            
+            .export-buttons { flex-direction: row; justify-content: center; }
+            .export-button { flex-grow: 1; }
+
+            .cards-grid, .insights-grid { grid-template-columns: 1fr; }
+
+            .chart-container { height: 300px; }
+            .axis-label.y { left: -65px; font-size: 0.75rem; }
+
+            .ai-button { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+
+            #insights-page .filter-group,
+            #insights-page .filter-group > div {
+                 flex-direction: column;
+                 align-items: stretch;
+            }
+            #insights-page .legend {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://tse1.mm.bing.net/th/id/OIP.ybwGXEtAStkJV88BemmJGwHaHa?w=1024&h=1024&rs=1&pid=ImgDetMain" alt="Toyota Logo" class="logo"/>
+                <div class="title">
+                    <h1>Rik<span class="ai">AI</span></h1>
+                    <p>COMPRENDERE. ANTICIPARE. DECIDERE.</p>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-button active" onclick="showPage('table')">TABELLA COMPARATIVA</button>
+                <button class="nav-button" onclick="showPage('insights')">INSIGHTS</button>
+                <button class="nav-button ai-style" onclick="showPage('analysis')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    PARLA CON IL CLIENTE
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Tabella Comparativa Page -->
+        <div id="table-page" class="page-section active">
+            <div class="table-section">
+                <div class="table-header">
+                    <div>
+                        <h2 class="section-title">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            TABELLA COMPARATIVA
+                        </h2>
+                        <div class="filter-group">
+                            <label class="filter-label">SEGMENTO:</label>
+                            <select><option>SEGMENTO A</option></select>
+                            <label class="filter-label">PERIODO:</label>
+                            <select id="monthSelect" onchange="handleMonthChange(event)">
+                                <option value="LUGLIO">LUGLIO 2025</option>
+                                <option value="GIUGNO">GIUGNO 2025</option>
+                                <option value="MAGGIO">MAGGIO 2025</option>
+                                <option value="APRILE">APRILE 2025</option>
+                                <option value="MARZO">MARZO 2025</option>
+                                <option value="FEBBRAIO">FEBBRAIO 2025</option>
+                                <option value="GENNAIO">GENNAIO 2025</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="export-buttons">
+                        <button class="export-button pdf" onclick="window.print()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <span>PDF</span>
+                        </button>
+                        <button class="export-button csv" onclick="exportToCsv('comparison-table.csv')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span>CSV</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="comparisonTable">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;">METRICA</th>
+                                <th class="toyota">AYGO X</th>
+                                <th>HYUNDAI INSTER</th>
+                                <th>BYD DOLPHIN SURF</th>
+                                <th>KIA PICANTO</th>
+                                <th>HYUNDAI I10</th>
+                                <th>FIAT PANDA</th>
+                                <th>SUZUKI IGNIS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                
+                <div class="notes">
+                    <div class="note-item">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        I dati si riferiscono al periodo selezionato.
+                    </div>
+                    <div class="note-item">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        Scorri la tabella orizzontalmente per vedere tutti i dati.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="insights-page" class="page-section">
+            <div class="insights-grid">
+                <div class="insight-card ai-summary-card full-width">
+                    <h2 class="section-title"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>RikAI - SINTESI DEL MESE</h2>
+                    <div class="ai-summary-content" id="ai-summary-content"></div>
+                </div>
+                <div class="insight-card full-width">
+                    <h2 class="section-title"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>ANALISI MULTIDIMENSIONALE</h2>
+                    <div class="chart-container"><svg class="spider-chart" viewBox="0 0 400 400"><circle cx="200" cy="200" r="160" fill="none" stroke="#e5e7eb" stroke-width="1"></circle><circle cx="200" cy="200" r="120" fill="none" stroke="#e5e7eb" stroke-width="1"></circle><circle cx="200" cy="200" r="80" fill="none" stroke="#e5e7eb" stroke-width="1"></circle><circle cx="200" cy="200" r="40" fill="none" stroke="#e5e7eb" stroke-width="1"></circle><line x1="200" y1="200" x2="200" y2="40" stroke="#e5e7eb" stroke-width="1"></line><line x1="200" y1="200" x2="338" y2="120" stroke="#e5e7eb" stroke-width="1"></line><line x1="200" y1="200" x2="338" y2="280" stroke="#e5e7eb" stroke-width="1"></line><line x1="200" y1="200" x2="200" y2="360" stroke="#e5e7eb" stroke-width="1"></line><line x1="200" y1="200" x2="62" y2="280" stroke="#e5e7eb" stroke-width="1"></line><line x1="200" y1="200" x2="62" y2="120" stroke="#e5e7eb" stroke-width="1"></line><polygon id="toyotaSpider" points="200,120 270,150 270,250 200,280 130,250 130,150" fill="#dc2626" fill-opacity="0.2" stroke="#dc2626" stroke-width="2"></polygon><polygon id="competitorSpider" points="200,100 280,140 280,260 200,300 120,260 120,140" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2" stroke-dasharray="5,5"></polygon><text x="200" y="30" text-anchor="middle" font-size="12" font-weight="bold">PREZZO</text><text x="350" y="110" text-anchor="start" font-size="12" font-weight="bold">BENEFIT</text><text x="350" y="290" text-anchor="start" font-size="12" font-weight="bold">RATA</text><text x="200" y="380" text-anchor="middle" font-size="12" font-weight="bold">ANTICIPO</text><text x="50" y="290" text-anchor="end" font-size="12" font-weight="bold">VFG</text><text x="50" y="110" text-anchor="end" font-size="12" font-weight="bold">KM ANNUI</text></svg></div>
+                    <div class="legend"><div class="legend-item"><div class="legend-color" style="background: #dc2626;"></div><span>Toyota Aygo X</span></div><div class="legend-item"><div class="legend-color" style="background: #6b7280;"></div><span>Media Competitor</span></div></div>
+                </div>
+                <div class="insight-card full-width">
+                    <h2 class="section-title"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4v16"></path></svg>CONFRONTO TEMPORALE</h2>
+                    <div class="filter-group">
+                        <div>
+                            <label class="filter-label">INDICATORE DA ANALIZZARE:</label>
+                            <select id="indicatorSelect" onchange="updateLineChart()"><option value="listino">LISTINO</option><option value="benefit">CUSTOMER BENEFIT</option><option value="transaction">TRANSACTION</option><option value="rata">RATA</option><option value="anticipo">ANTICIPO</option><option value="vfg">VFG</option></select>
+                        </div>
+                        <div>
+                            <label class="filter-label">BRAND DA VISUALIZZARE:</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;"><label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;"><input type="checkbox" id="brand-toyota" value="TOYOTA" checked="" onchange="updateLineChart()"><span>Toyota</span></label><label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;"><input type="checkbox" id="brand-inster" value="HYUNDAI INSTER" checked="" onchange="updateLineChart()"><span>Inster</span></label><label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;"><input type="checkbox" id="brand-picanto" value="KIA PICANTO" checked="" onchange="updateLineChart()"><span>Picanto</span></label><label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;"><input type="checkbox" id="brand-i10" value="HYUNDAI I10" checked="" onchange="updateLineChart()"><span>i10</span></label><label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;"><input type="checkbox" id="brand-panda" value="FIAT PANDA" checked="" onchange="updateLineChart()"><span>Panda</span></label><label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;"><input type="checkbox" id="brand-ignis" value="SUZUKI IGNIS" checked="" onchange="updateLineChart()"><span>Ignis</span></label></div>
+                        </div>
+                    </div>
+                    <div class="chart-container"><svg class="line-chart" viewBox="0 0 800 400" id="lineChart"></svg></div>
+                    <div class="legend" id="lineLegend"></div>
+                </div>
+            </div>
+        </div>
+        <div id="analysis-page" class="page-section">
+            <div class="comparison-section">
+                <h2 class="section-title"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>COMPARATORE INTERATTIVO</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <div>
+                            <label class="filter-label">PERIODO:</label>
+                            <select id="analysisMonthSelect" onchange="handleMonthChange(event)"><option value="LUGLIO">LUGLIO 2025</option><option value="GIUGNO">GIUGNO 2025</option><option value="MAGGIO">MAGGIO 2025</option><option value="APRILE">APRILE 2025</option><option value="MARZO">MARZO 2025</option><option value="FEBBRAIO">FEBBRAIO 2025</option><option value="GENNAIO">GENNAIO 2025</option></select>
+                        </div>
+                        <div>
+                            <label class="filter-label">SEGMENTO:</label><select><option>SEGMENTO A</option></select>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="help-text">Seleziona competitor per confronto</span>
+                        <select id="competitorSelect" onchange="updateCompetitorCards()"><option value="inster">HYUNDAI INSTER</option><option value="dolphin">BYD DOLPHIN SURF</option><option value="picanto">KIA PICANTO</option><option value="i10">HYUNDAI I10</option><option value="panda">FIAT PANDA</option><option value="ignis">SUZUKI IGNIS</option></select>
+                    </div>
+                </div>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3 class="card-title">TOYOTA AYGO X</h3>
+                        <a href="https://chatgpt.com/g/g-686d314baf148191b20f8bdcd0c2f8ca-michela-cliente-aygo-x" target="_blank" class="ai-button customer"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg><span>AI Customer</span></a>
+                        <div class="metric-list">
+                            <div class="metric-row"><span class="metric-name">LISTINO:</span><div class="metric-value"><strong id="toyota-card-listino"></strong><span id="toyota-listino-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">BENEFIT:</span><div class="metric-value"><strong id="toyota-card-benefit"></strong><span id="toyota-benefit-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">TRANSACTION:</span><div class="metric-value"><strong id="toyota-card-transaction"></strong><span id="toyota-transaction-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">RATA:</span><div class="metric-value"><strong id="toyota-card-rata"></strong><span id="toyota-rata-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">DURATA:</span><div class="metric-value"><strong id="toyota-card-durata"></strong><span id="toyota-durata-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">ANTICIPO:</span><div class="metric-value"><strong id="toyota-card-anticipo"></strong><span id="toyota-anticipo-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">VFG:</span><div class="metric-value"><strong id="toyota-card-vfg"></strong><span id="toyota-vfg-diff" class="diff-badge"></span></div></div>
+                            <div class="metric-row"><span class="metric-name">KM ANNUI:</span><div class="metric-value"><strong id="toyota-card-km"></strong><span id="toyota-km-diff" class="diff-badge"></span></div></div>
+                        </div>
+                    </div>
+                    <div class="card competitor">
+                        <h3 id="competitor-title" class="card-title"></h3>
+                        <a id="competitor-ai-link" href="https://chatgpt.com/g/g-686d3d5a942481918215c42c86171503-marco-cliente-fiat-panda" target="_blank" class="ai-button competitor"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg><span>AI Competitor</span></a>
+                        <div class="metric-list">
+                            <div class="metric-row"><span class="metric-name">LISTINO:</span><strong id="comp-listino"></strong></div>
+                            <div class="metric-row"><span class="metric-name">BENEFIT:</span><strong id="comp-benefit"></strong></div>
+                            <div class="metric-row"><span class="metric-name">TRANSACTION:</span><strong id="comp-transaction"></strong></div>
+                            <div class="metric-row"><span class="metric-name">RATA:</span><strong id="comp-rata"></strong></div>
+                            <div class="metric-row"><span class="metric-name">DURATA:</span><strong id="comp-durata"></strong></div>
+                            <div class="metric-row"><span class="metric-name">ANTICIPO:</span><strong id="comp-anticipo"></strong></div>
+                            <div class="metric-row"><span class="metric-name">VFG:</span><strong id="comp-vfg"></strong></div>
+                            <div class="metric-row"><span class="metric-name">KM ANNUI:</span><strong id="comp-km"></strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const monthlyData={LUGLIO:{toyota:{listino:18950,benefit:3e3,transaction:15950,rata:119,durata:48,anticipo:5270,vfg:8212,km:1e4},inster:{listino:26650,benefit:1e3,transaction:25650,rata:169,durata:36,anticipo:7910,vfg:14658,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16800,benefit:1750,transaction:15050,rata:119,durata:36,anticipo:3180,vfg:9744,km:5e3},i10:{listino:17450,benefit:1500,transaction:15950,rata:119,durata:48,anticipo:3530,vfg:9606,km:1e4},panda:{listino:18500,benefit:5e3,transaction:13500,rata:89,durata:48,anticipo:4565,vfg:5735,km:1e4},ignis:{listino:21200,benefit:2300,transaction:18900,rata:159,durata:48,anticipo:4980,vfg:11400,km:1e4}},GIUGNO:{toyota:{listino:18900,benefit:2800,transaction:16100,rata:122,durata:48,anticipo:5300,vfg:8300,km:1e4},inster:{listino:26500,benefit:800,transaction:25700,rata:171,durata:36,anticipo:7950,vfg:14700,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16700,benefit:1600,transaction:15100,rata:121,durata:36,anticipo:3200,vfg:9800,km:5e3},i10:{listino:17400,benefit:1400,transaction:16e3,rata:121,durata:48,anticipo:3550,vfg:9650,km:1e4},panda:{listino:18400,benefit:4800,transaction:13600,rata:91,durata:48,anticipo:4600,vfg:5800,km:1e4},ignis:{listino:21100,benefit:2200,transaction:18900,rata:161,durata:48,anticipo:5e3,vfg:11450,km:1e4}},MAGGIO:{toyota:{listino:18850,benefit:2600,transaction:16250,rata:125,durata:48,anticipo:5350,vfg:8400,km:1e4},inster:{listino:26400,benefit:700,transaction:25700,rata:173,durata:36,anticipo:8e3,vfg:14750,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16650,benefit:1500,transaction:15150,rata:123,durata:36,anticipo:3250,vfg:9850,km:5e3},i10:{listino:17350,benefit:1300,transaction:16050,rata:123,durata:48,anticipo:3600,vfg:9700,km:1e4},panda:{listino:18300,benefit:4600,transaction:13700,rata:93,durata:48,anticipo:4650,vfg:5850,km:1e4},ignis:{listino:21e3,benefit:2100,transaction:18900,rata:163,durata:48,anticipo:5050,vfg:11500,km:1e4}},APRILE:{toyota:{listino:18800,benefit:2500,transaction:16300,rata:127,durata:48,anticipo:5400,vfg:8450,km:1e4},inster:{listino:26300,benefit:600,transaction:25700,rata:175,durata:36,anticipo:8050,vfg:14800,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16600,benefit:1400,transaction:15200,rata:125,durata:36,anticipo:3300,vfg:9900,km:5e3},i10:{listino:17300,benefit:1200,transaction:16100,rata:125,durata:48,anticipo:3650,vfg:9750,km:1e4},panda:{listino:18200,benefit:4400,transaction:13800,rata:95,durata:48,anticipo:4700,vfg:5900,km:1e4},ignis:{listino:20900,benefit:2e3,transaction:18900,rata:165,durata:48,anticipo:5100,vfg:11550,km:1e4}},MARZO:{toyota:{listino:18750,benefit:2400,transaction:16350,rata:129,durata:48,anticipo:5450,vfg:8500,km:1e4},inster:{listino:26200,benefit:500,transaction:25700,rata:177,durata:36,anticipo:8100,vfg:14850,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16550,benefit:1300,transaction:15250,rata:127,durata:36,anticipo:3350,vfg:9950,km:5e3},i10:{listino:17250,benefit:1100,transaction:16150,rata:127,durata:48,anticipo:3700,vfg:9800,km:1e4},panda:{listino:18100,benefit:4200,transaction:13900,rata:97,durata:48,anticipo:4750,vfg:5950,km:1e4},ignis:{listino:20800,benefit:1900,transaction:18900,rata:167,durata:48,anticipo:5150,vfg:11600,km:1e4}},FEBBRAIO:{toyota:{listino:18700,benefit:2300,transaction:16400,rata:131,durata:48,anticipo:5500,vfg:8550,km:1e4},inster:{listino:26100,benefit:400,transaction:25700,rata:179,durata:36,anticipo:8150,vfg:14900,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16500,benefit:1200,transaction:15300,rata:129,durata:36,anticipo:3400,vfg:1e4,km:5e3},i10:{listino:17200,benefit:1e3,transaction:16200,rata:129,durata:48,anticipo:3750,vfg:9850,km:1e4},panda:{listino:18e3,benefit:4e3,transaction:14e3,rata:99,durata:48,anticipo:4800,vfg:6e3,km:1e4},ignis:{listino:20700,benefit:1800,transaction:18900,rata:169,durata:48,anticipo:5200,vfg:11650,km:1e4}},GENNAIO:{toyota:{listino:18650,benefit:2200,transaction:16450,rata:133,durata:48,anticipo:5550,vfg:8600,km:1e4},inster:{listino:26e3,benefit:300,transaction:25700,rata:181,durata:36,anticipo:8200,vfg:14950,km:5e3},dolphin:{listino:"N/D",benefit:"N/D",transaction:"N/D",rata:"N/D",durata:"N/D",anticipo:"N/D",vfg:"N/D",km:"N/D"},picanto:{listino:16450,benefit:1100,transaction:15350,rata:131,durata:36,anticipo:3450,vfg:10050,km:5e3},i10:{listino:17150,benefit:900,transaction:16250,rata:131,durata:48,anticipo:3800,vfg:9900,km:1e4},panda:{listino:17900,benefit:3800,transaction:14100,rata:101,durata:48,anticipo:4850,vfg:6050,km:1e4},ignis:{listino:20600,benefit:1700,transaction:18900,rata:171,durata:48,anticipo:5250,vfg:11700,km:1e4}}};
+        const competitorTitles={inster:"HYUNDAI INSTER",dolphin:"BYD DOLPHIN SURF",picanto:"KIA PICANTO",i10:"HYUNDAI I10",panda:"FIAT PANDA",ignis:"SUZUKI IGNIS"};
+        function formatValue(e,t=!0){return"N/D"===e||null===e||isNaN(e)?"N/D":t?"€ "+e.toLocaleString("it-IT"):e.toLocaleString("it-IT")}
+        function handleMonthChange(e){const t=event.target.value;document.getElementById("monthSelect").value=t,document.getElementById("analysisMonthSelect").value=t,updateTableData(),updateCompetitorCards(),document.getElementById("insights-page").classList.contains("active")&&updateAllInsights()}
+        function updateTableData(){const e=document.getElementById("monthSelect").value,t=monthlyData[e],n=document.getElementById("tableBody"),a=["listino","benefit","transaction","rata","durata","anticipo","vfg","km"],o=["LISTINO","CUSTOMER BENEFIT","TRANSACTION","RATA","DURATA","ANTICIPO","VFG","KM ANNUI"],i=["toyota","inster","dolphin","picanto","i10","panda","ignis"];let l=`\n                <tr class="model-row">\n                    <td class="metric-name">ALLESTIMENTO</td>\n                    <td class="toyota">Active MT</td><td>XTech 49 kWh</td><td>1.0 70 CV Hybrid</td><td>1.0 DPI 67CV</td>\n                    <td>1.0 MPI 67CV</td><td>1.0 70cv Hybrid</td><td>1.2 Cool Hybrid</td>\n                </tr>\n            `;a.forEach((e,n)=>{l+="<tr>",l+=`<td class="metric-name">${o[n]}</td>`,i.forEach(a=>{const o="toyota"===a,i=t[a]?t[a][e]:"N/D",d=!["durata","km"].includes(e);l+=`<td class="${o?"toyota":""}" data-metric="${e}">${formatValue(i,d)}</td>`}),l+="</tr>"}),n.innerHTML=l}
+        function updateCompetitorCards(){const e=document.getElementById("analysisMonthSelect").value,t=document.getElementById("competitorSelect").value,n=monthlyData[e],a=n.toyota,o=n[t];document.getElementById("competitor-title").textContent=competitorTitles[t],["listino","benefit","transaction","rata","durata","anticipo","vfg","km"].forEach(e=>{const t=!["durata","km"].includes(e);document.getElementById(`toyota-card-${e}`).textContent=formatValue(a[e],t),document.getElementById(`comp-${e}`).textContent=formatValue(o[e],t);const n=calculateDiff(a[e],o[e]),i=formatDiff(n),l=document.getElementById(`toyota-${e}-diff`);"N/D"===i.value?(l.innerHTML="<span>N/D</span>",l.style.background="#e5e7eb"):(l.innerHTML=`<span class="arrow ${i.arrowClass}">${i.arrow}</span> <span>${i.value}</span>`,l.style.background="#f3f4f6")})}
+        function calculateDiff(e,t){return"number"!=typeof e||"number"!=typeof t||0===t?null:100*(e-t)/t}
+        function formatDiff(e){if(null===e)return{value:"N/D",arrow:"",arrowClass:""};const t=Math.abs(e).toFixed(1);return e>0?{value:t+"%",arrow:"↑",arrowClass:"up"}:{value:t+"%",arrow:"↓",arrowClass:"down"}}
+        const brandColors={TOYOTA:"#dc2626","HYUNDAI INSTER":"#3b82f6","KIA PICANTO":"#f59e0b","HYUNDAI I10":"#6366f1","FIAT PANDA":"#ec4899","SUZUKI IGNIS":"#8b5cf6"};
+        function updateSpiderChart(){const e=document.getElementById("monthSelect").value,t=monthlyData[e],n={prezzo:160*(1-t.toyota.listino/3e4),benefit:160*t.toyota.benefit/5e3,rata:160*(1-t.toyota.rata/200),anticipo:160*(1-t.toyota.anticipo/1e4),vfg:160*(1-t.toyota.vfg/15e3),km:160*t.toyota.km/12e3},a=["inster","picanto","i10","panda","ignis"],o={prezzo:0,benefit:0,rata:0,anticipo:0,vfg:0,km:0};let i={prezzo:0,benefit:0,rata:0,anticipo:0,vfg:0,km:0};a.forEach(e=>{Object.keys(o).forEach(n=>{("number"==typeof t[e][n])&&(o[n]+=t[e][n],i[n]++)})}),Object.keys(o).forEach(e=>{i[e]>0&&(o[e]/=i[e])});const l={prezzo:160*(1-o.prezzo/3e4),benefit:160*o.benefit/5e3,rata:160*(1-o.rata/200),anticipo:160*(1-o.anticipo/1e4),vfg:160*(1-o.vfg/15e3),km:160*o.km/12e3},d=(e,t)=>`${200+e*Math.cos(t)},${200-e*Math.sin(t)}`,r=[Math.PI/2,Math.PI/6,-Math.PI/6,-Math.PI/2,-5*Math.PI/6,5*Math.PI/6],s=Object.values(n).map((e,t)=>d(Math.max(0,e),r[t])).join(" "),c=Object.values(l).map((e,t)=>d(Math.max(0,e),r[t])).join(" ");document.getElementById("toyotaSpider").setAttribute("points",s),document.getElementById("competitorSpider").setAttribute("points",c)}
+        function updateLineChart(){const e=document.getElementById("indicatorSelect").value,t=document.getElementById("lineChart"),n=document.getElementById("lineLegend");t.innerHTML="",n.innerHTML="";const a=[];if(Object.entries({"brand-toyota":"TOYOTA","brand-inster":"HYUNDAI INSTER","brand-picanto":"KIA PICANTO","brand-i10":"HYUNDAI I10","brand-panda":"FIAT PANDA","brand-ignis":"SUZUKI IGNIS"}).forEach(([e,t])=>{document.getElementById(e).checked&&a.push(t)}),0===a.length){const e=document.createElementNS("http://www.w3.org/2000/svg","text");return e.setAttribute("x","400"),e.setAttribute("y","200"),e.setAttribute("text-anchor","middle"),e.setAttribute("font-size","14"),e.setAttribute("fill","#6b7280"),e.textContent="Seleziona almeno un brand da visualizzare",void t.appendChild(e)}const o=["GEN","FEB","MAR","APR","MAG","GIU","LUG"],i=["GENNAIO","FEBBRAIO","MARZO","APRILE","MAGGIO","GIUGNO","LUGLIO"],l={toyota:"TOYOTA",inster:"HYUNDAI INSTER",picanto:"KIA PICANTO",i10:"HYUNDAI I10",panda:"FIAT PANDA",ignis:"SUZUKI IGNIS"};let d=-1/0,r=1/0;const s={};a.forEach(e=>s[e]=[]),i.forEach(e=>{const t=monthlyData[e];Object.entries(l).forEach(([e,n])=>{if(a.includes(n)){const a=t[e][indicator];"number"==typeof a?(s[n].push(a),d=Math.max(d,a),r=Math.min(r,a)):s[n].push(null)}})}),d===-1/0||(d*=1.1,r*=.9);for(let e=0;e<=5;e++){const a=50+60*e,o=document.createElementNS("http://www.w3.org/2000/svg","line");o.setAttribute("x1","80"),o.setAttribute("y1",a),o.setAttribute("x2","750"),o.setAttribute("y2",a),o.setAttribute("stroke","#e5e7eb"),o.setAttribute("stroke-width","1"),t.appendChild(o);const i=d-(d-r)*e/5,l=document.createElementNS("http://www.w3.org/2000/svg","text");l.setAttribute("x","70"),l.setAttribute("y",a+5),l.setAttribute("text-anchor","end"),l.setAttribute("font-size","12"),l.setAttribute("fill","#6b7280"),l.textContent="durata"===indicator||"km"===indicator?Math.round(i).toLocaleString("it-IT"):"€"+Math.round(i).toLocaleString("it-IT"),t.appendChild(l)}o.forEach((e,a)=>{const o=80+670*a/6,i=document.createElementNS("http://www.w3.org/2000/svg","text");i.setAttribute("x",o),i.setAttribute("y","380"),i.setAttribute("text-anchor","middle"),i.setAttribute("font-size","12"),i.setAttribute("fill","#6b7280"),i.textContent=e,t.appendChild(i)}),Object.entries(s).forEach(([o,i])=>{if(a.includes(o)&&i.some(e=>null!==e)){const a=document.createElementNS("http://www.w3.org/2000/svg","path");let s="";const c=brandColors[o]||"#6b7280";i.forEach((e,n)=>{if(null!==e){const a=80+670*n/6,o=50+300*(1-(e-r)/(d-r));""===s?s=`M ${a} ${o}`:s+=` L ${a} ${o}`;const i=document.createElementNS("http://www.w3.org/2000/svg","circle");i.setAttribute("cx",a),i.setAttribute("cy",o),i.setAttribute("r","4"),i.setAttribute("fill","white"),i.setAttribute("stroke",c),i.setAttribute("stroke-width","2"),t.appendChild(i)}}),a.setAttribute("d",s),a.setAttribute("stroke",c),a.setAttribute("stroke-width","3"),a.setAttribute("fill","none"),t.appendChild(a);const u=document.createElement("div");u.className="legend-item",u.innerHTML=`<div class="legend-line" style="background: ${c};"></div><span>${o}</span>`,n.appendChild(u)}})}
+        function updateAllInsights(){generateAiSummary(),updateSpiderChart(),updateLineChart()}
+        function generateAiSummary(){const e=document.getElementById("monthSelect").value,t=monthlyData[e],n=t.toyota;let a=[];const o=Object.values(t).filter(e=>"number"==typeof e.rata&&e!==n),i=Math.min(...o.map(e=>e.rata));n.rata<=i?a.push(`✔ <strong>Posizionamento Rata:</strong> Eccellente. Con ${formatValue(n.rata)}, Aygo X ha una delle rate più competitive del segmento.`):a.push(`⚠ <strong>Posizionamento Rata:</strong> Da monitorare. La rata di ${formatValue(n.rata)} è superiore a quella di alcuni competitor.`);const l=Object.values(t).filter(e=>"number"==typeof e.benefit&&e!==n),d=Math.max(...l.map(e=>e.benefit));if(n.benefit>=d)a.push(`✔ <strong>Customer Benefit:</strong> Punto di forza. Con ${formatValue(n.benefit)}, siamo leader nell'incentivo al cliente.`);else{const e=Object.entries(t).find(([e,t])=>t.benefit===d);a.push(`⚠ <strong>Customer Benefit:</strong> Competitivo ma non leader. ${competitorTitles[e[0]]} offre ${formatValue(e[1].benefit)}.`)}const r=t.panda;"number"==typeof r.transaction&&r.transaction<n.transaction?a.push(`✔ <strong>Prezzo Finale:</strong> Ottimo posizionamento, ma attenzione a Fiat Panda, che registra un prezzo transaction di ${formatValue(r.transaction)}.`):a.push(`✔ <strong>Prezzo Finale:</strong> Molto competitivo, con un transaction price di ${formatValue(n.transaction)} tra i più bassi.`);const s=document.getElementById("ai-summary-content");s.innerHTML=`\n                <p>Analizzando i dati di <strong>${e}</strong>, emergono i seguenti punti chiave per Toyota Aygo X:</p>\n                <ul>\n                    ${a.map(e=>`<li>${e}</li>`).join("")}\n                </ul>\n            `}
+        function exportToCsv(e){const t=document.getElementById("comparisonTable");let n=[];const a=[];t.querySelectorAll("thead th").forEach(e=>a.push(`"${e.textContent.trim()}"`)),n.push(a.join(",")),t.querySelectorAll("tbody tr").forEach(e=>{const t=[];e.querySelectorAll("td").forEach(e=>{let n=e.textContent.trim().replace(/"/g,'""');t.push(`"${n}"`)}),n.push(t.join(","))});const o="data:text/csv;charset=utf-8,"+encodeURI(n.join("\n")),i=document.createElement("a");i.setAttribute("href",o),i.setAttribute("download",e),document.body.appendChild(i),i.click(),document.body.removeChild(i)}
+        function showPage(e){document.querySelectorAll(".page-section").forEach(e=>e.classList.remove("active")),document.querySelectorAll(".nav-button").forEach(e=>e.classList.remove("active"));const t=document.querySelector(`.nav-button[onclick="showPage('${e}')"]`);document.getElementById(`${e}-page`).classList.add("active"),t.classList.add("active"),"insights"===e&&updateAllInsights()}
+        window.addEventListener("load",function(){updateTableData(),updateCompetitorCards()});
+    </script>
+</body>
+</html>
